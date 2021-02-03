@@ -28,7 +28,7 @@ library(DescTools) # for Desc, DunnTest
 
 #-- 1. Huller damage by treatment type ------------------------------------
 
-huller_dmg <- read_csv("./burks/data-intermediate/dmg_huller_y06_to_y15.csv")
+huller_dmg <- read_csv("./data/dmg_huller_y06_to_y15.csv")
 huller_dmg
 # A tibble: 7,262 x 8
 #   Ranch2 Block Variety Treatment pctNOW pctTwigborer  Year pctTotReject
@@ -55,7 +55,19 @@ huller_dmg <- huller_dmg %>%
     TRUE ~ "wtf"
   )) # filter finds no wtf
 
-block_code_lookup <- read_csv("./burks/data-intermediate/huller_block_code_lookup.csv")
+huller_dmg %>% 
+  filter(Trt_cat == "wtf")
+
+### NB Two-part process. First char to numerical block codes, then block
+### code to rep blocks
+block_code_lookup <- read_csv("./data/huller_block_code_lookup.csv")
+block_code_lookup
+# A tibble: 46 x 2
+# Block Block2
+#   <chr>  <dbl>
+# 1 13-1    13.1
+# 2 13-2    13.2
+# 3 13-3    13.3
 
 ### Use info from x to fix Huller Damage file
 huller_dmg <- right_join(block_code_lookup,huller_dmg)
@@ -63,13 +75,18 @@ huller_dmg <- right_join(block_code_lookup,huller_dmg)
 huller_dmg %>% 
   filter(is.na(Block2)) %>% 
   group_by(Year) %>% 
-  summarise(nObs = n()) # 473 records, all from 1a
+  summarise(nObs = n()) # 473 records, all from 2008
 
+### Make fake block number so treatment takes precedence
 huller_dmg$Block2[is.na(huller_dmg$Block2)] <- 1.0
 
 huller_dmg$Block2 <- block_problems(huller_dmg$Block2)
 
 unique(huller_dmg$Block2)
+
+### Need to get rep data
+
+#-- STOPPED HERE ---------------------------------------##
 
 ### Output huller_dmg to sas
 write.csv(huller_dmg,
