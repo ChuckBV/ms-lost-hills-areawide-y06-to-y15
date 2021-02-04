@@ -60,7 +60,7 @@ p1 <- ggplot(yr_avg, aes(fill=Type, y=PctNOW, x=as.factor(Year))) +
 p1
 
 ggsave(filename = "y06_y15_all_prod_dmg.jpg", 
-       plot = p1, device = "jpg", path = "./burks/results", 
+       plot = p1, device = "jpg", path = "./results", 
        dpi = 300, width = 5.83, height = 3.9, units = "in")  
 
 #-- 2. Damage by variety (NP v MO, huller data) ---------------------------------
@@ -93,7 +93,7 @@ p2
 
 #- 3. Damage by variety (NP v MO, huller data) -------------------------------
 
-windrow_interior <- read_csv("./burks/data-intermediate/windrow_interior_dmg_y06_to_y15_out_to_sas.csv") 
+windrow_interior <- read_csv("./data/windr") 
 
 var_by_yr2 <- windrow_interior %>% 
   filter(Variety %in% c("NP","MO")) %>% 
