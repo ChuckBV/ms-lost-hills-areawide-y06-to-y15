@@ -251,7 +251,7 @@ windrow_interior
 
 ### Output windrow_edge to sas
 write.csv(windrow_interior,
-          "./burks/data-intermediate/windrow_interior_dmg_y06_to_y15_out_to_sas.csv", 
+          "./data/windrow_interior_dmg_y06_to_y15_out_to_sas.csv", 
           row.names = FALSE)
 
 
