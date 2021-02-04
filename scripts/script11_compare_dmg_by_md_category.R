@@ -67,8 +67,6 @@ huller_dmg %>%
 ### Make fake block number so treatment takes precedence
 huller_dmg$Block2[is.na(huller_dmg$Block2)] <- 1.0
 
-huller_dmg$Block2 <- block_problems(huller_dmg$Block2)
-
 sort(unique(huller_dmg$Block2))
 
 ### Need to get rep data
@@ -87,9 +85,16 @@ x <- huller_dmg %>%
 x
   # 437 cases from 2008, Block2 = 1 (weight tickets)
 
+huller_dmg
+# A tibble: 7,262 x 12
+#   Block Block2 Ranch2 Variety Treatment pctNOW pctTwigborer  Year pctTotReject Trt_cat  Tier
+#   <chr>  <dbl>  <dbl> <chr>   <chr>      <dbl>        <dbl> <dbl>        <dbl> <chr>   <dbl>
+# 1 24-1    24.1   3440 FR      C          1.02        0       2006           NA insect~     7
+# 2 24-1    24.1   3440 FR      C          2.28        0       2006           NA insect~     7
+
 ### Output huller_dmg to sas
 write.csv(huller_dmg,
-          "./burks/data-intermediate/huller_dmg_y06_to_y15_out_to_sas.csv", 
+          "./data/huller_dmg_y06_to_y15_out_to_sas.csv", 
           row.names = FALSE)
 
 hdmg2 <- huller_dmg %>% 
