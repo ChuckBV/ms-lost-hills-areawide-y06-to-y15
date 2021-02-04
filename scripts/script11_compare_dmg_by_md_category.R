@@ -17,7 +17,7 @@
 library(tidyverse)
 library(lubridate)
 library(DescTools) # for Desc, DunnTest
-#library(FAS) # for dunnTest
+library(FSA) # for dunnTest and se
 #library(rcompanion) # for cldList
 
 # block_problems <- function(x){
@@ -29,45 +29,32 @@ library(DescTools) # for Desc, DunnTest
 #-- 1. Huller damage by treatment type ------------------------------------
 
 huller_dmg <- read_csv("./data/dmg_huller_y06_to_y15.csv")
-huller_dmg
-# A tibble: 7,262 x 8
-#   Ranch2 Block Variety Treatment pctNOW pctTwigborer  Year pctTotReject
-#    <dbl> <chr> <chr>   <chr>      <dbl>        <dbl> <dbl>        <dbl>
-# 1   3440 24-1  FR      C          1.02        0       2006           NA
-# 2   3440 24-1  FR      C          2.28        0       2006           NA
 
 ### Treatments and categories
-trts <- unique(huller_dmg$Treatment)
-trts
-
-(chem <- trts[c(1,4)])
-# [1] "C"    "Conv"
-(md <- trts[c(3,5,7,9,11,14,15)])
-# [1] "MD"      "1MD"     "2MD"     "50%MD"   "100%MD"  "EarlyMD" "StandMD"
-(both <- trts[c(2,6,8,10,12,13,16)])
-# [1] "CMD"    "1CMD"   "2CMD"   "50%C"   "100%C"  "EarlyC" "StandC"
-
-huller_dmg <- huller_dmg %>% 
-  mutate(Trt_cat = case_when(
-    Treatment %in% chem ~ "insecticide",
-    Treatment %in% md ~ "mating_disruption",
-    Treatment %in% both ~ "both",
-    TRUE ~ "wtf"
-  )) # filter finds no wtf
-
-huller_dmg %>% 
-  filter(Trt_cat == "wtf")
+# trts <- unique(huller_dmg$Treatment)
+# trts
+# 
+# (chem <- trts[c(1,4)])
+# # [1] "C"    "Conv"
+# (md <- trts[c(3,5,7,9,11,14,15)])
+# # [1] "MD"      "1MD"     "2MD"     "50%MD"   "100%MD"  "EarlyMD" "StandMD"
+# (both <- trts[c(2,6,8,10,12,13,16)])
+# # [1] "CMD"    "1CMD"   "2CMD"   "50%C"   "100%C"  "EarlyC" "StandC"
+# 
+# huller_dmg <- huller_dmg %>% 
+#   mutate(Trt_cat = case_when(
+#     Treatment %in% chem ~ "insecticide",
+#     Treatment %in% md ~ "mating_disruption",
+#     Treatment %in% both ~ "both",
+#     TRUE ~ "wtf"
+#   )) # filter finds no wtf
+# 
+# huller_dmg %>% 
+#   filter(Trt_cat == "wtf")
 
 ### NB Two-part process. First char to numerical block codes, then block
 ### code to rep blocks
 block_code_lookup <- read_csv("./data/huller_block_code_lookup.csv")
-block_code_lookup
-# A tibble: 46 x 2
-# Block Block2
-#   <chr>  <dbl>
-# 1 13-1    13.1
-# 2 13-2    13.2
-# 3 13-3    13.3
 
 ### Use info from x to fix Huller Damage file
 huller_dmg <- right_join(block_code_lookup,huller_dmg)
@@ -85,6 +72,21 @@ huller_dmg$Block2 <- block_problems(huller_dmg$Block2)
 unique(huller_dmg$Block2)
 
 ### Need to get rep data
+Rep_blocks <- read_csv("./data/lost_hills_arrangement.csv") %>% 
+  rename(Ranch2 = Ranch, 
+         Block2 = Block)
+
+
+huller_dmg <- left_join(huller_dmg,Rep_blocks)
+
+### Examine cases of NA in Tier
+x <- huller_dmg %>% 
+  filter(is.na(Tier)) %>% 
+  group_by(Year,Ranch2,Block2) %>% 
+  summarise(nObs = n())
+  # 437 cases from 2008, Block2 = 1 (weight tickets)
+  # all other cases involve Blocks 11.3 or 25.3
+
 
 #-- STOPPED HERE ---------------------------------------##
 
