@@ -2,7 +2,8 @@
 # script11_compare_dmg_by_md_category.R
 #
 # 1. Huller damage by treatment type
-# 2. Edge damage by treatment type
+# 2. Compare interior damage (line 142)
+# 3. Compare edge damage (line 300)
 #
 #
 # At level of non-parametric test, shows NOW_dmg is: md = insecticide > both
@@ -103,14 +104,14 @@ hdmg2 <- huller_dmg %>%
 hdmg2
 
 Desc(pctNOW ~ Trt_cat, data = hdmg2)
-# --------------------------------------------------------------------------------------------------- 
+# --------------------------------------------------------------------------#
 #   pctNOW ~ Trt_cat (hdmg2)
 # 
 # Summary: 
 #   n pairs: 301, valid: 301 (100.0%), missings: 0 (0.0%), groups: 3
 # 
 # 
-# both        insecticide  mating_disruption
+#                     both        insecticide  mating_disruption
 # mean                0.829              1.484              1.340
 # median              0.303              0.560              0.601
 # sd                  1.619              3.147              2.445
@@ -126,15 +127,16 @@ Desc(pctNOW ~ Trt_cat, data = hdmg2)
 hdmg2$Trt_cat <- factor(hdmg2$Trt_cat,
                         levels = c("insecticide","mating_disruption","both"))
 
-PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = hdmg2, method = "bonferroni")
+#PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = hdmg2, method = "bonferroni")
+PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = hdmg2) # method defaults to holm
 PT
 # 
-# Dunn's test of multiple comparisons using rank sums : bonferroni  
+# Dunn's test of multiple comparisons using rank sums : holm
 # 
 #                               mean.rank.diff    pval    
 # mating_disruption-insecticide      -6.436278 1.00000    
 # both-insecticide                  -49.314661 0.00026 ***
-# both-mating_disruption            -42.878383 0.00101 ** 
+# both-mating_disruption            -42.878383 0.00067 *** 
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -183,7 +185,7 @@ trts2
 setequal(trts,trts2)
 # [1] TRUE
 # Warning messages:
-#   1: Unknown or uninitialised column: `Block2`. 
+# 1: Unknown or uninitialised column: `Block2`. 
 # 2: Unknown or uninitialised column: `Block2`. 
 ### So we can use code from huller_damage for categories (lines 43-56)
 
@@ -261,7 +263,7 @@ interior2 <- windrow_interior %>%
 interior2
 
 Desc(pctNOW ~ Trt_cat, data = interior2)
-# --------------------------------------------------------------------------------------------------- 
+# --------------------------------------------------------------------------#
 #   pctNOW ~ Trt_cat (interior2)
 # 
 # Summary: 
@@ -284,15 +286,16 @@ Desc(pctNOW ~ Trt_cat, data = interior2)
 interior2$Trt_cat <- factor(interior2$Trt_cat,
                         levels = c("mating_disruption","insecticide","both"))
 
-PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = interior2, method = "bonferroni")
+#PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = interior2, method = "bonferroni")
+PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = interior2)
 PT
 # 
-# Dunn's test of multiple comparisons using rank sums : bonferroni  
+# Dunn's test of multiple comparisons using rank sums : holm  
 # 
-#                               mean.rank.diff   pval    
-# insecticide-mating_disruption      -1.221865 1.0000    
-# both-mating_disruption            -41.737997 0.0011 ** 
-# both-insecticide                  -40.516133 0.0033 ** 
+#                               mean.rank.diff    pval    
+# mating_disruption-insecticide      -6.436278 0.60547    
+# both-insecticide                  -49.314661 0.00026 ***
+# both-mating_disruption            -42.878383 0.00067 ***
 # ---
 # Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -388,14 +391,14 @@ edge2 <- windrow_edge %>%
 edge2
 
 Desc(pctNOW ~ Trt_cat, data = edge2)
-# --------------------------------------------------------------------------------------------------- 
+# -------------------------------------------------------------------------#
 #   pctNOW ~ Trt_cat (edge2)
 # 
 # Summary: 
 #   n pairs: 301, valid: 298 (99.0%), missings: 3 (1.0%), groups: 3
 # 
 # 
-# both        insecticide  mating_disruption
+#                      both        insecticide  mating_disruption
 # mean                2.247              2.886              3.644
 # median              1.009              1.582              2.219
 # sd                  3.204              5.462              5.287
@@ -412,11 +415,15 @@ Desc(pctNOW ~ Trt_cat, data = edge2)
 edge2$Trt_cat <- factor(edge2$Trt_cat,
                         levels = c("mating_disruption","insecticide","both"))
 
-PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = edge2, method = "bonferroni")
+#PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = edge2, method = "bonferroni")
+PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = edge2)
 PT
-# Dunn's test of multiple comparisons using rank sums : bonferroni  
+# 
+# Dunn's test of multiple comparisons using rank sums : holm  
 # 
 #                               mean.rank.diff   pval    
-# insecticide-mating_disruption      -17.55882 0.4797    
+# insecticide-mating_disruption      -17.55882 0.1599    
 # both-mating_disruption             -39.70952 0.0023 ** 
-# both-insecticide                   -22.15070 0.2343    
+# both-insecticide                   -22.15070 0.1562    
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1

@@ -334,6 +334,7 @@ dmg_all_vars
 # 3  0.394            1.17         1.50
 
 dmg_all_vars <- dmg_all_vars[complete.cases(dmg_all_vars), ]
+# loses valid interior blocks
 
 #-- 6. Run correlation and regression ---------------------------------------
 
