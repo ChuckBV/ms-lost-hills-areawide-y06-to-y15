@@ -29,7 +29,7 @@ windrow_dmg %>% # 0 obs
   filter(is.na(ranch))
 
 unique(windrow_dmg$ranch)
-# [1] [1]  345  344  346 3450 3440 3460
+# [1]  345  344  346 3450 3440 3460
 
 windrow_dmg <- windrow_dmg %>% 
   mutate(ranch = ifelse(ranch < 1000,10*ranch,ranch))

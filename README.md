@@ -27,3 +27,18 @@ information for 2005 to 2015.
 
 --------------------------- 78 cols ----------------------------------------|
 
+## Data Sets
+
+### Input data
+ - Huller damage: dmg_huller_y06_to_y15.csv
+ - Windrow damage: dmg_wndrw_y06_to_y15.csv
+ - NOW deg days f frm jan 1: now_deg_days_f_lost_hills_2005_to_2015.csv
+
+### Meta data
+ - Ranch and section lookup: huller_block_code_lookup.csv
+ - Tier rep block arrangement: lost_hills_arrangement.cv
+
+### Intermediate files for statistical input
+
+## Scripts (numbered double digits because of precursor repo)
+ 1. Correlation between huller, windrow edge, and e
