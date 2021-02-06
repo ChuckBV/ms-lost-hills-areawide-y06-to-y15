@@ -1,0 +1,9 @@
+"Year","Tier","treatment","dmg_now","tot_nuts","start_when","insecticide","pctNOW"
+2015,1,"EarlyC",137,4565,"early","Yes",3.00109529025192
+2015,2,"EarlyMD",93,4575,"early","No",2.0327868852459
+2015,3,"StandC",28,4532,"standard","Yes",0.617828773168579
+2015,4,"StandMD",44,4476,"standard","No",0.98302055406613
+2015,5,"EarlyC",99,4677,"early","Yes",2.11674150096216
+2015,6,"EarlyMD",176,4531,"early","No",3.88435224012359
+2015,7,"StandC",99,3058,"standard","Yes",3.23741007194245
+2015,8,"StandMD",608,3089,"standard","No",19.6827452249919

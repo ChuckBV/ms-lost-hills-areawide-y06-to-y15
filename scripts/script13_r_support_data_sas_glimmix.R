@@ -191,22 +191,24 @@ write.csv(interior2,
           "./data/dmg_wndrw_interior_y06_to_y15_to_glimmix.csv",
           row.names = FALSE)
 
-#------------------------ STOPPED HERE        -------------------------------#
 
 #-- 2. Output experiment 2006 and 2007 for GLIMMIX --------------------------
 
 expt06_2yr <- interior %>% 
-  mutate(Year = year(date),
-         Rep = paste0("r",ranch,"_",block)) %>% 
+  mutate(Year = year(date)) %>% 
   filter(Year %in% c(2006,2007)) %>% 
-  select(Year,Rep,treatment,Variety,dmg_now,tot_nuts)
+  select(Year,Tier,treatment,Variety,dmg_now,tot_nuts)
 
 expt06_2yr <- expt06_2yr %>% 
-  group_by(Year,Rep,treatment) %>% 
+  group_by(Year,Tier,treatment) %>% 
   summarise(dmg_now = sum(dmg_now, na.rm = TRUE),
             tot_nuts = sum(tot_nuts, na.rm = TRUE)) %>% 
   mutate(pctNOW = 100*dmg_now/tot_nuts)
 expt06_2yr
+
+write.csv(expt06_2yr,
+          "./data/expt06_2yr_windrow.csv",
+          row.names = FALSE)
 
 Desc(pctNOW ~ treatment, data = expt06_2yr)
 # -------------------------------------------------------------------------#
@@ -246,10 +248,9 @@ DescTools::DunnTest(pctNOW ~ treatment, data = expt06_2yr)
 #-- 3. Output experiment 2008 to 2011 for GLIMMIX -----------------
 
 expt08_4yr <- interior %>%  # 418 obs
-  mutate(Year = year(date),
-         Rep = paste0("r",ranch,"_",block)) %>% 
+  mutate(Year = year(date)) %>% 
   filter(Year %in% c(2008,2009,2010,2011)) %>% 
-  select(Year,Rep,treatment,Variety,dmg_now,tot_nuts)
+  select(Year,Tier,treatment,Variety,dmg_now,tot_nuts)
 
 unique(expt08_4yr$treatment)
 
@@ -260,7 +261,7 @@ expt08_4yr <- expt08_4yr %>%  # 335 obs
 unique(expt08_4yr$treatment) 
 
 expt08_4yr <- expt08_4yr %>% 
-  group_by(Year,Rep,treatment) %>% 
+  group_by(Year,Tier,treatment) %>% 
   summarise(dmg_now = sum(dmg_now, na.rm = TRUE),
             tot_nuts = sum(tot_nuts, na.rm = TRUE))
 
@@ -293,25 +294,59 @@ Desc(pctNOW ~ treatment, data = expt08_4yr)
 expt08_4yr$treatment <- factor(expt08_4yr$treatment, levels = c("1MD","1CMD","2MD","2CMD"))
 
 DescTools::DunnTest(pctNOW ~ treatment, data = expt08_4yr)
-  # Kruskal-Wallis finds no diff after multi-means test
+
+# Dunn's test of multiple comparisons using rank sums : holm  
+# 
+#           mean.rank.diff   pval    
+# 1CMD-1MD          -4.375 1.0000    
+# 2MD-1MD           -0.875 1.0000    
+# 2CMD-1MD         -12.750 0.0394 *  
+# 2MD-1CMD           3.500 1.0000    
+# 2CMD-1CMD         -8.375 0.2967    
+# 2CMD-2MD         -11.875 0.0567 .  
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 write.csv(expt08_4yr,
-          "./burks/data-intermediate/dmg_wndrw_interior_expt08_4yr_to_sas.csv",
+          "./data/dmg_wndrw_interior_expt08_4yr_to_sas.csv",
           row.names = FALSE)
+
+expt08_4yr
+# A tibble: 32 x 8
+# Groups:   Year, Tier [32]
+# Year  Tier treatment dmg_now tot_nuts disp_dens insecticide pctNOW
+#   <dbl> <dbl> <fct>       <dbl>    <dbl>     <dbl> <chr>        <dbl>
+# 1  2008     1 2MD            77     6797         2 No           1.13 
+# 2  2008     2 2CMD           10     6742         2 Yes          0.148
+# 3  2008     3 1MD           105    12228         1 No           0.859
+# 4  2008     4 1CMD           57    12331         1 Yes          0.462
+# 5  2008     5 1MD           303     5706         1 No           5.31 
+# 6  2008     6 1CMD          170     8800         1 Yes          1.93 
+# 7  2008     7 2MD           116     5338         2 No           2.17 
+# 8  2008     8 2CMD           52     5352         2 Yes          0.972
+# 9  2009     1 1CMD           15     4842         1 Yes          0.310
+# 10  2009     2 1MD            44     5708         1 No           0.771
 
 expt08_4yr %>% 
   group_by(insecticide,disp_dens) %>% 
   summarise(nObs = sum(!is.na(pctNOW)),
             mn = mean(pctNOW, na.rm = TRUE),
             sem = FSA::se(pctNOW))
+# A tibble: 4 x 5
+# Groups:   insecticide [2]
+# insecticide disp_dens  nObs    mn    sem
+#   <chr>           <dbl> <int> <dbl>  <dbl>
+# 1 No                  1     8 1.67  0.637 
+# 2 No                  2     8 0.932 0.217 
+# 3 Yes                 1     8 0.644 0.197 
+# 4 Yes                 2     8 0.330 0.0946
 
 #-- 4. Output experiment 2012 to 2014 for GLIMMIX ---------------------------
 
 expt12_3yr <- interior %>%  # 165 obs
-  mutate(Year = year(date),
-         Rep = paste0("r",ranch,"_",block)) %>% 
+  mutate(Year = year(date)) %>% 
   filter(Year %in% c(2013,2013,2014)) %>% 
-  select(Year,Rep,treatment,Variety,dmg_now,tot_nuts)
+  select(Year,Tier,treatment,Variety,dmg_now,tot_nuts)
 
 unique(expt12_3yr$treatment)
 # [1] "Conv"   "50%C"   "50%MD"  "100%C"  "100%MD"
@@ -320,7 +355,7 @@ expt12_3yr <- expt12_3yr %>%  # 130 obs
   filter(treatment != "Conv")
 
 expt12_3yr <- expt12_3yr %>% 
-  group_by(Year,Rep,treatment) %>% 
+  group_by(Year,Tier,treatment) %>% 
   summarise(dmg_now = sum(dmg_now, na.rm = TRUE),
             tot_nuts = sum(tot_nuts, na.rm = TRUE))
 
@@ -330,43 +365,72 @@ expt12_3yr <- expt12_3yr %>%
          pctNOW = 100*dmg_now/tot_nuts)
 
 Desc(pctNOW ~ treatment, data = expt12_3yr)
-# --------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------------------------------------- 
 #   pctNOW ~ treatment (expt12_3yr)
 # 
 # Summary: 
-#   n pairs: 44, valid: 44 (100.0%), missings: 0 (0.0%), groups: 4
+#   n pairs: 16, valid: 16 (100.0%), missings: 0 (0.0%), groups: 4
 # 
 # 
 # 100%C   100%MD     50%C    50%MD
-# mean      0.727    1.168    0.784    1.534
-# median    0.307    0.881    0.235    1.488
-# sd        0.852    0.977    1.099    1.317
-# IQR       0.928    1.153    0.759    1.443
-# n            11       11       11       11
+# mean      0.720    1.110    0.948    1.666
+# median    0.438    1.082    0.489    1.619
+# sd        0.764    0.782    1.212    1.138
+# IQR       0.727    1.320    1.092    1.169
+# n             4        4        4        4
 # np      25.000%  25.000%  25.000%  25.000%
 #   NAs           0        0        0        0
 # 0s            0        0        0        0
 # 
 # Kruskal-Wallis rank sum test:
-#   Kruskal-Wallis chi-squared = 5.3603, df = 3, p-value = 0.1472
+#   Kruskal-Wallis chi-squared = 2.5368, df = 3, p-value = 0.4687
+
+expt12_3yr
+# A tibble: 16 x 8
+# Groups:   Year, Tier [16]
+# Year  Tier treatment dmg_now tot_nuts phero_conc insecticide pctNOW
+#   <dbl> <dbl> <chr>       <dbl>    <dbl> <chr>      <chr>        <dbl>
+# 1  2013     3 50%C           10     5124 half       Yes          0.195
+# 2  2013     4 50%MD          20     5560 half       No           0.360
+# 3  2013     5 100%C          11     4854 whole      Yes          0.227
+# 4  2013     6 100%MD         22     5025 whole      No           0.438
+# 5  2013     7 100%C          21     3233 whole      Yes          0.650
+# 6  2013     8 100%MD         14     3250 whole      No           0.431
+# 7  2013     9 50%C            4     3810 half       Yes          0.105
+# 8  2013    10 50%MD          64     4957 half       No           1.29 
+# 9  2014     1 100%MD         90     5214 whole      No           1.73 
+# 10  2014     2 100%C           9     4916 whole      Yes          0.183
+# 11  2014     3 50%MD          95     4878 half       No           1.95 
+# 12  2014     4 50%C           38     4852 half       Yes          0.783
+# 13  2014     5 100%MD         90     4879 whole      No           1.84 
+# 14  2014     6 100%C          84     4610 whole      Yes          1.82 
+# 15  2014     7 50%MD         100     3263 half       No           3.06 
+# 16  2014     8 50%C           94     3469 half       Yes          2.71
 
 expt12_3yr %>% 
   group_by(insecticide,phero_conc) %>% 
   summarise(nObs = sum(!is.na(pctNOW)),
             mn = mean(pctNOW, na.rm = TRUE),
             sem = FSA::se(pctNOW))
+# A tibble: 4 x 5
+# Groups:   insecticide [2]
+# insecticide phero_conc  nObs    mn   sem
+#   <chr>       <chr>      <int> <dbl> <dbl>
+# 1 No          half           4 1.67  0.569
+# 2 No          whole          4 1.11  0.391
+# 3 Yes         half           4 0.948 0.606
+# 4 Yes         whole          4 0.720 0.382
 
 write.csv(expt12_3yr,
-          "./burks/data-intermediate/dmg_wndrw_interior_expt12_3yr_to_sas.csv",
+          "./data/dmg_wndrw_interior_expt12_3yr_to_sas.csv",
           row.names = FALSE)
 
 #-- 5. Output experiment 2015 for GLIMMIX ---------------------------
 
 expt15 <- interior %>%  # 82 obs
-  mutate(Year = year(date),
-         Rep = paste0("r",ranch,"_",block)) %>% 
+  mutate(Year = year(date)) %>% 
   filter(Year == 2015) %>% 
-  select(Year,Rep,treatment,Variety,dmg_now,tot_nuts)
+  select(Year,Tier,treatment,Variety,dmg_now,tot_nuts)
 
 unique(expt15$treatment)
 # [1] "EarlyC"  "EarlyMD" "StandC"  "StandMD" "Conv" 
@@ -375,7 +439,7 @@ expt15 <- expt15 %>%  # 66 obs
   filter(treatment != "Conv")
 
 expt15 <- expt15 %>% 
-  group_by(Year,Rep,treatment) %>% 
+  group_by(Year,Tier,treatment) %>% 
   summarise(dmg_now = sum(dmg_now, na.rm = TRUE),
             tot_nuts = sum(tot_nuts, na.rm = TRUE))
 
@@ -385,25 +449,39 @@ expt15 <- expt15 %>%
          pctNOW = 100*dmg_now/tot_nuts)
 
 Desc(pctNOW ~ treatment, data = expt15)
-# --------------------------------------------------------------------------------------------------------- 
+# ----------------------------------------------------------------------------------------------------------- 
 #   pctNOW ~ treatment (expt15)
 # 
 # Summary: 
-#   n pairs: 22, valid: 22 (100.0%), missings: 0 (0.0%), groups: 4
+#   n pairs: 8, valid: 8 (100.0%), missings: 0 (0.0%), groups: 4
 # 
 # 
 # EarlyC  EarlyMD   StandC  StandMD
-# mean      2.566    2.959    1.683    8.469
-# median    1.753    3.195    1.585    1.014
-# sd        2.145    1.402    1.881   10.276
-# IQR       2.203    2.076    1.491   17.686
-# n             6        6        5        5
-# np      27.273%  27.273%  22.727%  22.727%
-#   NAs           0        0        0        0
+# mean      2.559    2.959    1.928   10.333
+# median    2.559    2.959    1.928   10.333
+# sd        0.625    1.309    1.852   13.223
+# IQR       0.442    0.926    1.310    9.350
+# n             2        2        2        2
+# np      25.000%  25.000%  25.000%  25.000%
+# NAs           0        0        0        0
 # 0s            0        0        0        0
 # 
 # Kruskal-Wallis rank sum test:
-#   Kruskal-Wallis chi-squared = 1.4672, df = 3, p-value = 0.6899
+#   Kruskal-Wallis chi-squared = 0.5, df = 3, p-value = 0.9189
+
+expt15
+# A tibble: 8 x 8
+# Groups:   Year, Tier [8]
+# Year  Tier treatment dmg_now tot_nuts start_when insecticide pctNOW
+#   <dbl> <dbl> <chr>       <dbl>    <dbl> <chr>      <chr>        <dbl>
+# 1  2015     1 EarlyC        137     4565 early      Yes          3.00 
+# 2  2015     2 EarlyMD        93     4575 early      No           2.03 
+# 3  2015     3 StandC         28     4532 standard   Yes          0.618
+# 4  2015     4 StandMD        44     4476 standard   No           0.983
+# 5  2015     5 EarlyC         99     4677 early      Yes          2.12 
+# 6  2015     6 EarlyMD       176     4531 early      No           3.88 
+# 7  2015     7 StandC         99     3058 standard   Yes          3.24 
+# 8  2015     8 StandMD       608     3089 standard   No          19.7
 
 expt15 %>% 
   group_by(insecticide,start_when) %>% 
@@ -414,11 +492,11 @@ expt15 %>%
 # Groups:   insecticide [2]
 # insecticide start_when  nObs    mn   sem
 #   <chr>       <chr>      <int> <dbl> <dbl>
-# 1 No          early          6  2.96 0.573
-# 2 No          standard       5  8.47 4.60 
-# 3 Yes         early          6  2.57 0.876
-# 4 Yes         standard       5  1.68 0.841
+# 1 No          early          2  2.96 0.926
+# 2 No          standard       2 10.3  9.35 
+# 3 Yes         early          2  2.56 0.442
+# 4 Yes         standard       2  1.93 1.31 
 
 write.csv(expt15,
-          "./burks/data-intermediate/dmg_wndrw_interior_expt15_to_sas.csv",
+          "./data/dmg_wndrw_interior_expt15_to_sas.csv",
           row.names = FALSE)
