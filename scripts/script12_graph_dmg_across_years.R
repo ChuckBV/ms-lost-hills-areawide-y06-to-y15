@@ -51,7 +51,7 @@ p2b <- ggplot(var_by_yr2, aes(fill=Variety, y=pctNOW, x=as.factor(Year))) +
         axis.title.y = element_text(color = "black", size = 10),
         legend.title = element_text(color = "black", size = 10),
         legend.text = element_text(color = "black", size = 10),
-        legend.position = c(0.25,0.75))
+        legend.position = c(0.15,0.75))
 p2b
 
 ggsave(filename = "y06_y15_windrow_interior_dmg.jpg", 
@@ -101,7 +101,7 @@ p2c <- ggplot(var_by_yr3, aes(fill=Variety, y=pctNOW, x=as.factor(Year))) +
         axis.title.y = element_text(color = "black", size = 10),
         legend.title = element_text(color = "black", size = 10),
         legend.text = element_text(color = "black", size = 10),
-        legend.position = c(0.25,0.75))
+        legend.position = c(0.15,0.75))
 p2c
 
 ggsave(filename = "y06_y15_dmg_np_vs_mo_in_insecticide.jpg", 
@@ -131,7 +131,13 @@ Desc(pctNOW ~ Variety, data = var_by_yr3)
 #   Kruskal-Wallis chi-squared = 0.46286, df = 1, p-value = 0.4963
 
 
-var_by_yr3
+var_by_yr3 %>% 
+  group_by(Variety) %>% 
+  summarise(nObs = n(),
+            mn = mean(pctNOW),
+            sem = se(pctNOW))
+
+t.test(pctNOW ~ Variety, data = var_by_yr3, var.equal = TRUE)
 
 #-- 5. Damage by year with interior data ------------------------------------
 
@@ -175,4 +181,23 @@ p1b
 ggsave(filename = "y06_y15_all_windrow_internal_dmg.jpg", 
        plot = p1b, device = "jpg", path = "./results", 
        dpi = 300, width = 5.83, height = 3.9, units = "in")  
+
+### Overall average by year
+yr_avg2 %>% 
+  group_by(Year) %>% 
+  summarise(PctNOW = mean(PctNOW)) %>% 
+  arrange(PctNOW)
+# A tibble: 10 x 2
+# Year PctNOW
+#   <dbl>  <dbl>
+# 1  2010  0.355
+# 2  2013  0.446
+# 3  2007  0.468
+# 4  2011  0.594
+# 5  2006  1.20 
+# 6  2009  1.31 
+# 7  2008  1.59 
+# 8  2014  2.15 
+# 9  2012  2.44 
+# 10  2015  5.40 
 

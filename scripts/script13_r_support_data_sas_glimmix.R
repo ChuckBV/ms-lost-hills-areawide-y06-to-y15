@@ -155,7 +155,7 @@ Desc(pctNOW ~ type, data = interior2)
 #   n pairs: 97, valid: 97 (100.0%), missings: 0 (0.0%), groups: 3
 # 
 # 
-# CMD     Conv       MD
+#             CMD     Conv       MD
 # mean      0.988    1.923    1.845
 # median    0.490    1.241    0.997
 # sd        1.010    2.371    3.127
@@ -186,6 +186,15 @@ interior2 <- interior2 %>%
   select(Year,Tier,type,dmg_now,tot_nuts,pctNOW)
 View(interior2)
 
+### Report sample size
+interior2 %>% 
+  summarise(Mn = mean(tot_nuts),
+            Min_nuts = min(tot_nuts),
+            Max_nuts = max(tot_nuts))
+
+interior2 %>% 
+  arrange(tot_nuts)
+
 
 write.csv(interior2,
           "./data/dmg_wndrw_interior_y06_to_y15_to_glimmix.csv",
@@ -205,6 +214,12 @@ expt06_2yr <- expt06_2yr %>%
             tot_nuts = sum(tot_nuts, na.rm = TRUE)) %>% 
   mutate(pctNOW = 100*dmg_now/tot_nuts)
 expt06_2yr
+
+expt06_2yr %>% 
+  group_by(treatment) %>% 
+  summarise(nObs = n(),
+            mn = mean(pctNOW),
+            sem = se(pctNOW))
 
 write.csv(expt06_2yr,
           "./data/expt06_2yr_windrow.csv",
@@ -290,6 +305,12 @@ Desc(pctNOW ~ treatment, data = expt08_4yr)
 # 
 # Kruskal-Wallis rank sum test:
 #   Kruskal-Wallis chi-squared = 10.683, df = 3, p-value = 0.01357
+
+expt08_4yr %>% 
+  group_by(treatment) %>% 
+  summarise(nObs = n(),
+            mn = mean(pctNOW),
+            sem = se(pctNOW))
 
 expt08_4yr$treatment <- factor(expt08_4yr$treatment, levels = c("1MD","1CMD","2MD","2CMD"))
 
