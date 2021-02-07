@@ -1,127 +1,31 @@
 #===========================================================================#
-# script13_r_support_data_sas_glimmix.R
+# script18_now_degree_days_10yr.R
 #
-# 1. x
+# 1. Upload NOW degree-day data for study period
+# 2. Consolidate 10 data frames into 1
 #
 #===========================================================================#
 
 library(tidyverse) # dplyr used to select and modify common/imp variables
 library(lubridate) # for work with date formats
-library(janitor)# clean_names and compare_df_cols
-library(Hmisc) # for describe()
-library(data.table)
+library(car)
 
-#-- 1. Upload NOW degree-day data for study period --------------------------
+#-- 1. Upload NOW degree-day data for study period -------------------------
 
-### Find and list csv files for windrow damage
-my_path <- "./burks/data-raw-2006-to-2011/"
-(csv_files <-  list.files(my_path, pattern = ".csv")) # 34 files
-(cimis_files <- csv_files[str_detect(csv_files,"ucipm")]) # 11 files
-# [1] "ucipm-now-ddf-lost-hills-2005.csv" "ucipm-now-ddf-lost-hills-2006.csv"
-# [3] "ucipm-now-ddf-lost-hills-2007.csv" "ucipm-now-ddf-lost-hills-2008.csv"
-# [5] "ucipm-now-ddf-lost-hills-2009.csv" "ucipm-now-ddf-lost-hills-2010.csv"
-# [7] "ucipm-now-ddf-lost-hills-2011.csv" "ucipm-now-ddf-lost-hills-2012.csv"
-# [9] "ucipm-now-ddf-lost-hills-2013.csv" "ucipm-now-ddf-lost-hills-2014.csv"
-# [11] "ucipm-now-ddf-lost-hills-2015.csv"
+ddf_lh_10yr <- read_csv("./data/now_deg_days_f_lost_hills_2005_to_2015.csv")
 
-(cimis_names <- str_remove(cimis_files, ".csv"))
-
-### Get relevant cimis files into a list of data frames
-cimis_files %>%
-  purrr::map(function(cimis_files){ # iterate through each file name
-    assign(x = str_remove(cimis_files, ".csv"), # Remove file extension ".csv"
-           value = read_csv(paste0(my_path, cimis_files)),
-           envir = .GlobalEnv)
-  }) -> df_list_read # Assign to a list
-
-### Clean df names one by one
-dd05 <- `ucipm-now-ddf-lost-hills-2005` # make df names more useable
-dd06 <- `ucipm-now-ddf-lost-hills-2006`
-dd07 <- `ucipm-now-ddf-lost-hills-2007`
-dd08 <- `ucipm-now-ddf-lost-hills-2008`
-dd09 <- `ucipm-now-ddf-lost-hills-2009`
-dd10 <- `ucipm-now-ddf-lost-hills-2010`
-dd11 <- `ucipm-now-ddf-lost-hills-2011`
-dd12 <- `ucipm-now-ddf-lost-hills-2012`
-dd13 <- `ucipm-now-ddf-lost-hills-2013`
-dd14 <- `ucipm-now-ddf-lost-hills-2014`
-dd15 <- `ucipm-now-ddf-lost-hills-2015`
-
-rm(`ucipm-now-ddf-lost-hills-2005`,`ucipm-now-ddf-lost-hills-2006`,`ucipm-now-ddf-lost-hills-2007`,`ucipm-now-ddf-lost-hills-2008`,`ucipm-now-ddf-lost-hills-2009`,`ucipm-now-ddf-lost-hills-2010`,`ucipm-now-ddf-lost-hills-2011`,`ucipm-now-ddf-lost-hills-2012`,`ucipm-now-ddf-lost-hills-2013`,`ucipm-now-ddf-lost-hills-2014`,`ucipm-now-ddf-lost-hills-2015`)
-  # take out trash
-# A tibble: 365 x 8
-#   station      date       air_min air_max degree_days accumulated_dd     x    x1
-#   <chr>        <chr>        <dbl>   <dbl>       <dbl>          <dbl> <dbl> <dbl>
-# 1 LOST_HILLS.A 01/01/2005      37      57        0.27           0.27    NA    NA
-# 2 LOST_HILLS.A 01/02/2005      44      54        0              0.27    NA    NA
-dd05 <- clean_names(dd05)
-dd05
-
-ddnames <- colnames(dd05)
-  # get good column names w janitor::clean_names() and store in vector
-
-### Impose column names on df for each year
-colnames(dd06) <- ddnames
-colnames(dd07) <- ddnames
-colnames(dd08) <- ddnames
-colnames(dd09) <- ddnames
-colnames(dd10) <- ddnames
-colnames(dd11) <- ddnames
-colnames(dd12) <- ddnames
-colnames(dd13) <- ddnames
-colnames(dd14) <- ddnames
-colnames(dd15) <- ddnames
-
-dd05$x <- as.character(dd05$x)
-dd06$x <- as.character(dd06$x)
-dd07$x <- as.character(dd07$x)
-dd08$x <- as.character(dd08$x)
-dd09$x <- as.character(dd09$x)
-dd10$x <- as.character(dd10$x)
-dd11$x <- as.character(dd11$x)
-dd12$x <- as.character(dd12$x)
-dd13$x <- as.character(dd13$x)
-dd14$x <- as.character(dd14$x)
-dd15$x <- as.character(dd15$x)
-
-dd05$x1 <- as.character(dd05$x1)
-dd06$x1 <- as.character(dd06$x1)
-dd07$x1 <- as.character(dd07$x1)
-dd08$x1 <- as.character(dd08$x1)
-dd09$x1 <- as.character(dd09$x1)
-dd10$x1 <- as.character(dd10$x1)
-dd11$x1 <- as.character(dd11$x1)
-dd12$x1 <- as.character(dd12$x1)
-dd13$x1 <- as.character(dd13$x1)
-dd14$x1 <- as.character(dd14$x1)
-dd15$x1 <- as.character(dd15$x1)
-
-
-ddf_lh_10yr <- bind_rows(list(dd05,dd06,dd07,dd08,dd09,dd10,dd11,dd12,dd13,dd14,dd15))
 ddf_lh_10yr
-# A tibble: 4,017 x 8
-#   station      date       air_min air_max degree_days accumulated_dd x     x1   
-#   <chr>        <chr>        <dbl>   <dbl>       <dbl>          <dbl> <chr> <chr>
-# 1 LOST_HILLS.A 01/01/2005      37      57        0.27           0.27 NA    NA   
-# 2 LOST_HILLS.A 01/02/2005      44      54        0              0.27 NA    NA
 
-rm(df_list_read,dd05,dd06,dd07,dd08,dd09,dd10,dd11,dd12,dd13,dd14,dd15)
-
-ddf_lh_10yr$date <- as.Date(mdy(ddf_lh_10yr$date))
-ddf_lh_10yr$yr <- year(ddf_lh_10yr$date)
-ddf_lh_10yr$julian <- yday(ddf_lh_10yr$date)
-
-write.csv(ddf_lh_10yr,
-          "./burks/data-intermediate/now_deg_days_f_lost_hills_2005_to_2015.csv",
-          row.names = FALSE)
-
+### Select Jun 15
 ddf_jun15 <- ddf_lh_10yr %>% 
   select(station,date,yr,julian,accumulated_dd) %>% 
   filter(julian == 167)
 
+### Is there an observable warming trend over the decade?
 plot(accumulated_dd ~ yr, data = ddf_jun15)
 m1 <- lm(accumulated_dd ~ yr, data = ddf_jun15)
 summary(m1) # P =  0.13, rsqr = 0.15
+  # No
 
 ddf <- ddf_jun15 %>% 
   select(yr,accumulated_dd)
@@ -130,7 +34,22 @@ ddf <-  ddf %>%
   filter(yr > 2005) %>% 
   rename(Year = yr,
          now_ddf = accumulated_dd)
+ddf
+# A tibble: 10 x 2
+# Year now_ddf
+#   <dbl>   <dbl>
+# 1  2006   1122.
+# 2  2007   1368.
+# 3  2008   1137.
+# 4  2009   1285.
+# 5  2010    974.
+# 6  2011    879.
+# 7  2012   1221.
+# 8  2013   1412.
+# 9  2014   1558.
+# 10  2015   1475.
 
+### Try again with August 1
 ddf_aug1 <- ddf_lh_10yr %>% 
   select(station,date,yr,julian,accumulated_dd) %>% 
   filter(julian == 214)
@@ -141,6 +60,22 @@ ddf_aug1 <- ddf_aug1 %>%
   rename(Year = yr,
          ddf_aug01 = accumulated_dd)
 
+ddf_aug1
+# A tibble: 10 x 2
+# Year ddf_aug01
+# <dbl>     <dbl>
+# 1  2006     2344.
+# 2  2007     2451.
+# 3  2008     2275.
+# 4  2009     2405.
+# 5  2010     2025.
+# 6  2011     1905.
+# 7  2012     2214.
+# 8  2013     2520.
+# 9  2014     2686.
+# 10  2015     2585.
+
+### Try again with September 1
 ddf_sep1 <- ddf_lh_10yr %>% 
   select(station,date,yr,julian,accumulated_dd) %>% 
   filter(julian == 245)
@@ -152,20 +87,74 @@ ddf_sep1 <- ddf_sep1 %>%
          ddf_sep01 = accumulated_dd)
 
 ddf_sep1
+# A tibble: 10 x 2
+# Year ddf_sep01
+#   <dbl>     <dbl>
+# 1  2006     3021.
+# 2  2007     3196.
+# 3  2008     3039.
+# 4  2009     3099.
+# 5  2010     2680.
+# 6  2011     2582.
+# 7  2012     2975.
+# 8  2013     3253.
+# 9  2014     3412.
+# 10  2015     3303.
 
 #-- 2. Upload damage data for Nonpareil and Monterey ------------------------
 
-windrow_interior <- read_csv("./burks/data-intermediate/windrow_interior_dmg_y06_to_y15_out_to_sas.csv") 
+windrow_interior <- read_csv("./data/windrow_interior_dmg_y06_to_y15_out_to_sas.csv") 
+windrow_interior
 
 ### The following are from script12
 var_by_yr3 <- windrow_interior %>% 
   filter(Variety %in% c("NP","MO") & Trt_cat == "insecticide") %>% 
-  group_by(Year,Variety) %>% 
+  group_by(Year,block,Variety) %>% 
   summarise(pctNOW = mean(pctNOW, na.rm = TRUE)) %>% 
   pivot_wider(names_from = Variety, values_from = pctNOW) %>% 
-  select(Year,NP,MO) %>% 
-  mutate(dom_var = ifelse(NP > MO,"NP","Mo"))
+  mutate(dom_var = ifelse(NP > MO,"NP","MO"))
 
+var_by_yr3
+# A tibble: 60 x 4
+# Groups:   Year, block [60]
+#    Year block    MO    NP
+#   <dbl> <dbl> <dbl> <dbl>
+# 1  2006  24.1 1.26  1.17 
+# 2  2006  24.2 4.30  2.61 
+# 3  2006  24.3 2.04  0.865
+
+length(unique(var_by_yr3$block))
+# [1] 18
+
+var_by_yr3 <- var_by_yr3 %>% 
+  mutate(np_index = NP/(NP+MO))
+
+x <- var_by_yr3 %>% 
+  ungroup(.) %>% 
+  mutate(Year = factor(Year, levels = unique(Year)),
+         block = factor(block, levels = unique(block)))
+
+ggplot(x, aes(x = Year, y = np_index)) +
+  geom_boxplot() 
+
+ggplot(x, aes(x = block, y = np_index)) +
+  geom_boxplot() 
+
+  
+m1 <- lm(np_index ~ Year + block, data = x) 
+Anova(m1)
+# Note: model has aliased coefficients
+# sums of squares computed by model comparison
+# Anova Table (Type II tests)
+# 
+# Response: np_index
+#           Sum Sq Df F value    Pr(>F)    
+# Year      3.2116  8  7.6983 1.239e-05 ***
+# block     0.8171 16  0.9793    0.5004    
+# Residuals 1.6166 31                      
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ 
+    # Sloppy, but strongly suggests that this is not about box effects
 
 var_by_yr3
 # A tibble: 10 x 4
