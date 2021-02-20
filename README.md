@@ -49,6 +49,4 @@ information for 2005 to 2015.
  - script16_glmm_bin_windrow_interior_y12_3yr.sas
  - script17_glmm_bin_windrow_interior_y15.sas
  - script18_now_degree_days_10yr.R
-
- 
  
