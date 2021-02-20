@@ -25,8 +25,6 @@ Data files in this repository include huller damage, damage assessments from
 windrow samples collected by the research department, and degree-day \
 information for 2005 to 2015.
 
---------------------------- 78 cols ----------------------------------------|
-
 ## Data Sets
 
 ### Input data
@@ -40,5 +38,17 @@ information for 2005 to 2015.
 
 ### Intermediate files for statistical input
 
-## Scripts (numbered double digits because of precursor repo)
- 1. Correlation between huller, windrow edge, and e
+## Scripts
+ - script10_compare_windrow_production_damage.R
+ - script11_compare_dmg_by_md_category.R
+ - script12_graph_dmg_across_years.R
+ - script13_r_support_data_sas_glimmix.R
+ - script14_glmm_bin_windrow_interior_10yr.sas
+ - script14b_glmm_bin_windrow_interior_2yr.sas
+ - script15_glmm_bin_windrow_interior_y08_4yr.sas
+ - script16_glmm_bin_windrow_interior_y12_3yr.sas
+ - script17_glmm_bin_windrow_interior_y15.sas
+ - script18_now_degree_days_10yr.R
+
+ 
+ 
