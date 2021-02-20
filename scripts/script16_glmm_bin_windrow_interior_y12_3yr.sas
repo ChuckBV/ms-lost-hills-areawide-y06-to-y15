@@ -18,5 +18,4 @@ proc glimmix data = y12_3yr;
   random Year|Tier;
 run;
 quit;
-/* F = 21.35, df = 2,249.9; P < 0.0001 */
-/* means sep a, a, b                   */
+

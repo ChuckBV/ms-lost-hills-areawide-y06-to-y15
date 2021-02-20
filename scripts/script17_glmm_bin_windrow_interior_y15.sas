@@ -18,5 +18,3 @@ proc glimmix data = y15;
   random Tier;
 run;
 quit;
-/* F = 21.35, df = 2,249.9; P < 0.0001 */
-/* means sep a, a, b                

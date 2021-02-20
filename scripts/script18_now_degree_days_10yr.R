@@ -1,14 +1,24 @@
 #===========================================================================#
 # script18_now_degree_days_10yr.R
 #
-# 1. Upload NOW degree-day data for study period
-# 2. Consolidate 10 data frames into 1
+# Exploratory script examining whether temperature or other factors could
+# be identified as strongly influencing whether there was more damage in
+# NP than MO or vice-versa. Degree-days did not seem to be a factor, and
+# it did not appear that there were one or a few blocks that were 
+# pre-disposed for damage in one variety compared to the other.
+#
+# 1. Upload NOW degree-day data for study period (line 20)
+#     - Examine dd by year at certain Julian dates
+# 2. Upload damage data for Nonpareil and Monterey (line 110)
+#     - Examines whether there was a treatment x block pattern
+#      in which variety gets greater damage
+#     - t-test for Jun 15, reported in paper, is at line 203
+# 3. Plot dd vs Julian for ead of the 10 years (line 239)
 #
 #===========================================================================#
 
 library(tidyverse) # dplyr used to select and modify common/imp variables
-library(lubridate) # for work with date formats
-library(car)
+library(lubridate) # for work with date format
 
 #-- 1. Upload NOW degree-day data for study period -------------------------
 
@@ -126,6 +136,7 @@ var_by_yr3
 length(unique(var_by_yr3$block))
 # [1] 18
 
+### Create an index that is the ration of NP to total damage
 var_by_yr3 <- var_by_yr3 %>% 
   mutate(np_index = NP/(NP+MO))
 
@@ -134,9 +145,11 @@ x <- var_by_yr3 %>%
   mutate(Year = factor(Year, levels = unique(Year)),
          block = factor(block, levels = unique(block)))
 
+### Plot index by year (obs = block)
 ggplot(x, aes(x = Year, y = np_index)) +
   geom_boxplot() 
 
+### Plot index by block (obs = year)
 ggplot(x, aes(x = block, y = np_index)) +
   geom_boxplot() 
 

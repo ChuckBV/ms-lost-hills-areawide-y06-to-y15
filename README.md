@@ -37,7 +37,8 @@ information for 2005 to 2015.
  - dmg_wndrw_interior_y06_to_y15_to_glimmix.csv
  - expt06_2yr_windrow.csv (2006 and 2006 data)
  - dmg_wndrw_interior_expt08_4yr_to_sas.csv (2008-2011 data)
- - 
+ - dmg_wndrw_interior_expt12_3yr_to_sas.csv (2012-2014 data)
+ - dmg_wndrw_interior_expt15_to_sas.csv
 
 ## Scripts
  - script10_compare_windrow_production_damage.R
