@@ -10,9 +10,9 @@
 #
 #===========================================================================#
 
-library(tidyverse)
-library(lubridate)
-library(DescTools)
+library(tidyverse) # preferred R dialet
+library(lubridate) # work with dates
+library(DescTools) # data summary and nonparametric tests
 library(FSA) # for their se() function
 library(Hmisc) # for describe()
 
@@ -65,6 +65,7 @@ unique(interior$variety)
 # [9] NA          "Ruby"      "Fr"        "Ca"        "Mo"        "Bu"        "Pr"        "Ru"       
 # [17] "Mi"   
 
+### Enforce uniform variety labels and avoid duplication
 interior <- interior %>% 
   mutate(Variety = case_when(
     variety == "Bu" ~ "BU",
@@ -121,15 +122,13 @@ interior # 941 obs
 interior <- left_join(interior,Rep_blocks)
 
 interior[!complete.cases(interior), ]
-# A tibble: 3 x 14
-# date       type  plot  treatment variety ranch block tot_nuts inf_now dmg_now  Year Variety  Tier
-#   <date>     <chr> <chr> <chr>     <chr>   <dbl> <dbl>    <dbl>   <dbl>   <dbl> <dbl> <chr>   <dbl>
-# 1 2006-08-24 Conv  Inte~ C         NP       3460  24.4      663       4       4  2006 NP         NA
-# 2 2006-10-08 Conv  Inte~ C         Monter~  3460  24.4      530      13      10  2006 MO         NA
-# 3 2006-10-08 Conv  Inte~ C         Fritz    3460  24.4      686       4       4  2006 FR         NA
-  # Three cases of 24.4 in 2006 with the wrong rep number
+# A tibble: 0 x 14
+# ... with 14 variables: date <date>, type <chr>, plot <chr>, treatment <chr>,
+#   variety <chr>, ranch <dbl>, block <dbl>, tot_nuts <dbl>, inf_now <dbl>, dmg_now <dbl>,
+#   Year <dbl>, Variety <chr>, Tier <dbl>, WestToEast <dbl>
 
 glimpse(interior) # looks good from this view
+
 interior %>% 
   filter(is.na(Tier)) # 0 obs--good!
 
@@ -186,15 +185,16 @@ interior2 <- interior2 %>%
   select(Year,Tier,type,dmg_now,tot_nuts,pctNOW)
 View(interior2)
 
+
 ### Report sample size
 interior2 %>% 
   summarise(Mn = mean(tot_nuts),
             Min_nuts = min(tot_nuts),
             Max_nuts = max(tot_nuts))
-
-interior2 %>% 
-  arrange(tot_nuts)
-
+# A tibble: 1 x 3
+# Mn Min_nuts Max_nuts
+#   <dbl>    <dbl>    <dbl>
+# 1 5336.     1072    12753
 
 write.csv(interior2,
           "./data/dmg_wndrw_interior_y06_to_y15_to_glimmix.csv",
@@ -268,6 +268,7 @@ expt08_4yr <- interior %>%  # 418 obs
   select(Year,Tier,treatment,Variety,dmg_now,tot_nuts)
 
 unique(expt08_4yr$treatment)
+# [1] "1MD"  "2MD"  "2CMD" "1CMD" "Conv"
 
 ### Remove conv to make this a straight factorial
 expt08_4yr <- expt08_4yr %>%  # 335 obs
@@ -311,6 +312,13 @@ expt08_4yr %>%
   summarise(nObs = n(),
             mn = mean(pctNOW),
             sem = se(pctNOW))
+# A tibble: 4 x 4
+# treatment  nObs    mn    sem
+#   <chr>     <int> <dbl>  <dbl>
+# 1 1CMD          8 0.644 0.197 
+# 2 1MD           8 1.67  0.637 
+# 3 2CMD          8 0.330 0.0946
+# 4 2MD           8 0.932 0.217 
 
 expt08_4yr$treatment <- factor(expt08_4yr$treatment, levels = c("1MD","1CMD","2MD","2CMD"))
 

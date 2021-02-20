@@ -33,8 +33,10 @@ information for 2005 to 2015.
  - Ranch and section lookup: huller_block_code_lookup.csv
  - Tier rep block arrangement: lost_hills_arrangement.cv
 
-### Intermediate files for statistical input
+### Intermediate files for statistical input (to *.sas scripts)
  - dmg_wndrw_interior_y06_to_y15_to_glimmix.csv
+ - expt06_2yr_windrow.csv (2006 and 2006 data)
+ - dmg_wndrw_interior_expt08_4yr_to_sas.csv (2008-2011 data)
  - 
 
 ## Scripts
