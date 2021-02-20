@@ -15,17 +15,10 @@
 #===========================================================================#
 
 ### Load libraries
-library(tidyverse)
-library(lubridate)
+library(tidyverse) # preferred R dialect
+library(lubridate) # work with dates
 library(DescTools) # for Desc, DunnTest
 library(FSA) # for dunnTest and se
-#library(rcompanion) # for cldList
-
-# block_problems <- function(x){
-#   y <- if_else(x == 11.4,11.3,
-#                if_else(x == 25.2,25.1,x))
-#   return(y)
-# }
 
 #-- 1. Huller damage by treatment type ------------------------------------
 
@@ -33,9 +26,8 @@ huller_dmg <- read_csv("./data/dmg_huller_y06_to_y15.csv")
 
 ### Treatments and categories
 trts <- unique(huller_dmg$Treatment)
-trts
-# 
-(chem <- trts[c(1,4)])
+
+(chem <- trts[c(1,4)]) # parentheses print output from assignment
 # [1] "C"    "Conv"
 (md <- trts[c(3,5,7,9,11,14,15)])
 # [1] "MD"      "1MD"     "2MD"     "50%MD"   "100%MD"  "EarlyMD" "StandMD"
@@ -51,7 +43,7 @@ huller_dmg <- huller_dmg %>%
    )) # filter finds no wtf
 # 
 huller_dmg %>% 
-  filter(Trt_cat == "wtf")
+  filter(Trt_cat == "wtf") # 0 obs so all cases covered
 
 ### NB Two-part process. First char to numerical block codes, then block
 ### code to rep blocks
@@ -93,15 +85,16 @@ huller_dmg
 # 1 24-1    24.1   3440 FR      C          1.02        0       2006           NA insect~     7
 # 2 24-1    24.1   3440 FR      C          2.28        0       2006           NA insect~     7
 
-### Output huller_dmg to sas
-write.csv(huller_dmg,
-          "./data/huller_dmg_y06_to_y15_out_to_sas.csv", 
-          row.names = FALSE)
-
 hdmg2 <- huller_dmg %>% 
   group_by(Year,Trt_cat,Tier,Variety,) %>% 
   summarise(pctNOW = mean(pctNOW, na.rm = TRUE))
 hdmg2
+# A tibble: 301 x 5
+# Groups:   Year, Trt_cat, Tier [97]
+# Year Trt_cat      Tier Variety pctNOW
+#   <dbl> <chr>       <dbl> <chr>    <dbl>
+# 1  2006 both            2 MO       0.569
+# 2  2006 both            2 NP       0.176
 
 Desc(pctNOW ~ Trt_cat, data = hdmg2)
 # --------------------------------------------------------------------------#
@@ -126,8 +119,6 @@ Desc(pctNOW ~ Trt_cat, data = hdmg2)
 
 hdmg2$Trt_cat <- factor(hdmg2$Trt_cat,
                         levels = c("insecticide","mating_disruption","both"))
-
-#PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = hdmg2, method = "bonferroni")
 PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = hdmg2) # method defaults to holm
 PT
 # 
@@ -172,7 +163,6 @@ windrow_interior
 # 1  2006  3440  24.1 C         Fritz      1.39 
 # 2  2006  3440  24.1 C         Monterrey  1.26 
 
-#windrow_edge$block <- block_problems(windrow_edge$block)
 windrow_interior %>% # changes 3 instances of 11.4
   filter(block %in% c(11.4,25.2)) # comes up 0
 
@@ -286,7 +276,6 @@ Desc(pctNOW ~ Trt_cat, data = interior2)
 interior2$Trt_cat <- factor(interior2$Trt_cat,
                         levels = c("mating_disruption","insecticide","both"))
 
-#PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = interior2, method = "bonferroni")
 PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = interior2)
 PT
 # 
@@ -315,7 +304,6 @@ windrow_edge
 # 1  2006  3440  24.1 C         Fritz      1.52 
 # 2  2006  3440  24.1 C         Monterrey  3.23 
 
-#windrow_edge$block <- block_problems(windrow_edge$block)
 windrow_edge %>% # changes 3 instances of 11.4
   filter(block %in% c(11.4,25.2)) # Three instances in 2007
 
@@ -328,9 +316,6 @@ trts2
 setequal(trts,trts2)
 # [1] TRUE
 # Warning messages:
-#   1: Unknown or uninitialised column: `Block2`. 
-# 2: Unknown or uninitialised column: `Block2`. 
-### So we can use code from huller_damage for categories (lines 43-56)
 
 chem <- c("C","Conv")
 md <- c("MD","1MD","2MD","50%MD","100%MD","EarlyMD","StandMD")
@@ -380,11 +365,6 @@ windrow_edge
 
 
 ### Output windrow_edge to sas
-write.csv(windrow_edge,
-          "./data/windrow_edge_dmg_y06_to_y15_out_to_sas.csv", 
-          row.names = FALSE)
-
-
 edge2 <- windrow_edge %>% 
   group_by(Year,Trt_cat,Tier,Variety,) %>% 
   summarise(pctNOW = mean(pctNOW, na.rm = TRUE))
@@ -415,7 +395,6 @@ Desc(pctNOW ~ Trt_cat, data = edge2)
 edge2$Trt_cat <- factor(edge2$Trt_cat,
                         levels = c("mating_disruption","insecticide","both"))
 
-#PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = edge2, method = "bonferroni")
 PT <- DescTools::DunnTest(pctNOW ~ Trt_cat, data = edge2)
 PT
 # 

@@ -4,11 +4,10 @@ Repository:  ms-lost-hills-areawide-y06-to-y15
 
 ## Overview
 
-Files compare damage between plots treated with mating disruption, 
-insecticide, or both. Similar experiments were run at the Paramount Farming
-(Wonderful Orchards) Lost Hills location from 2006 to 2015. Plots compared
-mating disruption, alone, insecticide alone, or both together. The mating
-disruption treatments were further subdivided by mating disruption intensity.
+Analysis of similar experiments conducted at the Paramount Farming (Wonderful
+Orchards) Lost Hills location from 2006 to 2015. Plots compared mating 
+disruption alone, insecticide alone, or both together. The mating disruption 
+treatments were further subdivided by mating disruption intensity.
 
 Experiments included:
  - Insecticide only vs. mating disruption vs. both (2006 and 2007)
@@ -18,8 +17,6 @@ Experiments included:
  with or without insecticide (five treatments) (2012-2014)
  - Insecticide, and mating disruption with early or standard start time
  with or without insectide (five treatments) (2015 only)
-
-Initial data wrangling is done in gitub.com/chuckbv/Y12-lost-hills-higbee-4yr
 
 Data files in this repository include huller damage, damage assessments from
 windrow samples collected by the research department, and degree-day \
@@ -32,11 +29,13 @@ information for 2005 to 2015.
  - Windrow damage: dmg_wndrw_y06_to_y15.csv
  - NOW deg days f frm jan 1: now_deg_days_f_lost_hills_2005_to_2015.csv
 
-### Meta data
+### Metadata
  - Ranch and section lookup: huller_block_code_lookup.csv
  - Tier rep block arrangement: lost_hills_arrangement.cv
 
 ### Intermediate files for statistical input
+ - dmg_wndrw_interior_y06_to_y15_to_glimmix.csv
+ - 
 
 ## Scripts
  - script10_compare_windrow_production_damage.R
