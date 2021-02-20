@@ -1,33 +1,27 @@
 #===========================================================================#
 # script12_graph_dmg_across_years.R
 #
-#        Sections 1& 2 not used, removed
-#  (1. Damage by treatment category, huller data, 10 year graph)
-#  (2. Damage by variety, NP v MO, huller data)
-#  3. Damage by variety (NP v MO, interior windrow data)
-#  4. Damage by variety (NP v MO, interior, insecticide only, 10 yr graph)
-#  5. Damage by treatment category (windrow interior data, 10 year graph) 
+# Generate a graph comparing damage in plots treated with insecticide,
+# mating disruption, or both at the Lost Hills site from 2006 to 2015
+#
+#  1. Damage by variety (NP v MO, interior windrow data) (line 20)
+#  2. Damage by variety (NP v MO, interior, insecticide only, 10 yr graph)
+#     (line 75)
+#  3. Damage by treatment category (windrow interior data, 10 year graph) 
+#     (line 155)
 #
 # Use figure from #5, not #1
 #
 #===========================================================================#
 
-library(tidyverse)
-library(lubridate)
-library(DescTools)
+library(tidyverse) # preferred R dialect
+library(lubridate) # work with dates
+library(DescTools) # data summary and nonparametric statistics
+library(FSA) # for se function
 
-### Use huller data as coded/formatted for output to SAS
-#huller_dmg <- read_csv("./data/huller_dmg_y06_to_y15_out_to_sas.csv")
+#- 1. Damage by variety (NP v MO, windrow interior data) --------------------
 
-#-- 1. Damage by treatment category --------------------------------------
-
-  # Removed
-
-#-- 2. Damage by variety (NP v MO, huller data) ---------------------------------
-
-# Removed
-
-#- 3. Damage by variety (NP v MO, windrow interior data) -------------------------------
+### NP vs MO for all treatment plots. Not used in manuscript, see section 2
 
 windrow_interior <- read_csv("./data/windrow_interior_dmg_y06_to_y15_out_to_sas.csv") 
 
@@ -79,7 +73,10 @@ Desc(pctNOW ~ Variety, data = var_by_yr2)
 # Kruskal-Wallis rank sum test:
 #  Kruskal-Wallis chi-squared = 0.051429, df = 1, p-value = 0.8206
 
-#- Damage by variety (NP v MO, interior, insecticide only, 10 yr graph) -----
+#- 2. Damage by variety (int NP v MO, insecticide only, 10 yr graph) --------
+
+### Insecticide only used to remove differences in treatment response as
+### a potential confounding variable
 
 var_by_yr3 <- windrow_interior %>% 
   filter(Variety %in% c("NP","MO") & Trt_cat == "insecticide") %>% 
@@ -110,7 +107,7 @@ ggsave(filename = "y06_y15_dmg_np_vs_mo_in_insecticide.jpg",
 
 
 Desc(pctNOW ~ Variety, data = var_by_yr3)
-# --------------------------------------------------------------------------------------------------- 
+# -------------------------------------------------------------------------# 
 #   pctNOW ~ Variety (var_by_yr3)
 # 
 # Summary: 
@@ -136,10 +133,27 @@ var_by_yr3 %>%
   summarise(nObs = n(),
             mn = mean(pctNOW),
             sem = se(pctNOW))
+# A tibble: 2 x 4
+# Variety  nObs    mn   sem
+#   <fct>   <int> <dbl> <dbl>
+# 1 NP         10  1.44 0.381
+# 2 MO         10  1.01 0.316
 
 t.test(pctNOW ~ Variety, data = var_by_yr3, var.equal = TRUE)
+# 
+# Two Sample t-test
+# 
+# data:  pctNOW by Variety
+# t = 0.8634, df = 18, p-value = 0.3993
+# alternative hypothesis: true difference in means is not equal to 0
+# 95 percent confidence interval:
+#   -0.6129349  1.4682122
+# sample estimates:
+#   mean in group NP mean in group MO 
+# 1.435263         1.007624 
 
-#-- 5. Damage by year with interior data ------------------------------------
+
+#-- 3. Damage by treatment category (windrow interior, 10yr graph) ----------
 
 yr_avg2 <- windrow_interior %>% 
   group_by(Year,Trt_cat) %>% 
