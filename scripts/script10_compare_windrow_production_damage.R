@@ -22,12 +22,6 @@ library(lubridate)
 library(janitor) # for compare_df_col
 library(psycho)
 
-block_problems <- function(x){
-  y <- if_else(x == 11.4,11.3,
-               if_else(x == 25.2,25.1,x))
-  return(x)
-}
-
 ### NB. For comparing windrow and huller damage, quarter-section blocks are
 ### appropriate. For subseqent examination of treatments, proper designation
 ### of reps will be important.
@@ -89,8 +83,8 @@ windrow_dmg
 
 #-- 3. Examine huller data by ranch, block and year -------------------------
 
-### Taking the opportunity to compare with block codes in the
-### w
+### Taking the opportunity to compare with block codes in all years of the
+### study
 
 ### Summary of huller codes
 x <- huller_dmg %>% 
@@ -98,6 +92,12 @@ x <- huller_dmg %>%
   summarise(nObs = n()) %>% 
   pivot_wider(names_from = Year, names_prefix = "yr", values_from = nObs)
 x
+# A tibble: 59 x 12
+# Groups:   Ranch2, Block [59]
+#   Ranch2 Block yr2007 yr2008 yr2009 yr2010 yr2011 yr2012 yr2013 yr2014 yr2015 yr2006
+#    <dbl> <chr>  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>
+# 1   3440 13-1       2     46     33     33     55     22     35     24     32     NA
+# 2   3440 13-2       2     42     30     30     53     22     39     23     26     NA
 
 ### Need a Year variable
 windrow_dmg$Year <- year(windrow_dmg$date)
@@ -110,6 +110,19 @@ windrow_dmg <- windrow_dmg %>%
 windrow_dmg %>% 
   group_by(Year) %>% 
   summarise(nObs = n())
+# A tibble: 10 x 2
+# Year  nObs
+#   <dbl> <int>
+# 1  2006   207
+# 2  2007   195
+# 3  2008   308
+# 4  2009   163
+# 5  2010   172
+# 6  2011   163
+# 7  2012   151
+# 8  2013   161
+# 9  2014   157
+# 10  2015   155
 
 windrow_dmg <- windrow_dmg %>% 
   mutate(pctNOW = 100*dmg_now/tot_nuts) 
@@ -144,6 +157,13 @@ x2 <- huller_dmg %>%
   summarise(nObs = n()) %>% 
   pivot_wider(names_from = Year, names_prefix = "yr", values_from = nObs)
 x2
+# A tibble: 59 x 13
+# Groups:   Ranch2, Block, Block2 [59]
+# Ranch2 Block Block2 yr2007 yr2008 yr2009 yr2010 yr2011 yr2012 yr2013 yr2014 yr2015 yr2006
+#   <dbl> <chr>  <dbl>  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>
+# 1   3440 13-1    13.1      2     46     33     33     55     22     35     24     32     NA
+# 2   3440 13-2    13.2      2     42     30     30     53     22     39     23     26     NA
+
 
 ### Block2 now useful for huller_damage
 a <-sort(unique(huller_dmg$Block2))
@@ -338,6 +358,7 @@ dmg_all_vars <- dmg_all_vars[complete.cases(dmg_all_vars), ]
 
 #-- 6. Run correlation and regression ---------------------------------------
 
+### Get correlation matrix
 x <- cor(dmg_all_vars) 
 x
 #                     huller windrow_interior windrow_edge
@@ -345,12 +366,7 @@ x
 # windrow_interior 0.8274589        1.0000000    0.7117741
 # windrow_edge     0.7572187        0.7117741    1.0000000
 
-### Seven easy graphs to visualize correlation matrices
-### http://jamesmarquezportfolio.com/correlation_matrices_in_r.html
-### NB--This is crude, should use logistic regression, but would
-### have to use assumed denominator for huller sample
-chart.Correlation(dmg_all[,5:7], histogram=TRUE, pch=19)
-
+### Linear regression, windrow_interior on huller
 lreg_int_v_huller <- lm(windrow_interior ~ huller, data = dmg_all)
 summary(lreg_int_v_huller)
 # Call:
@@ -372,6 +388,7 @@ summary(lreg_int_v_huller)
 # Multiple R-squared:  0.6874,	Adjusted R-squared:  0.6869 
 # F-statistic:  1423 on 1 and 647 DF,  p-value: < 2.2e-16
 
+### Linear regression, windrow_edge on huller
 lreg_edge_v_huller <- lm(windrow_edge ~ huller, data = dmg_all)
 summary(lreg_edge_v_huller)
 # 
