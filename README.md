@@ -2,6 +2,8 @@
 
 Repository:  ms-lost-hills-areawide-y06-to-y15
 
+[![DOI](https://zenodo.org/badge/335468449.svg)](https://zenodo.org/badge/latestdoi/335468449)
+
 ## Overview
 
 Analysis of similar experiments conducted at the Paramount Farming (Wonderful
